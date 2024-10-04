@@ -18,7 +18,13 @@ from unstructured_ingest.v2.processes.partitioner import PartitionerConfig
 
 @task
 def extract_pdf_unstructured():
-    dotenv.load_dotenv(".env")
+
+    # Get the parent directory path (where your .env file is located)
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    # Construct the full path to the .env file
+    env_path = os.path.join(parent_dir, '.env')
+    dotenv.load_dotenv(env_path)
     Pipeline.from_configs(
         context=ProcessorConfig(),
         indexer_config=S3IndexerConfig(remote_url=os.getenv("AWS_S3_URL")),
