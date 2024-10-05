@@ -1,0 +1,3 @@
+unstructured-ingest=0.0.23
+unstructured-ingest[s3]
+unstructured-ingest[remote]

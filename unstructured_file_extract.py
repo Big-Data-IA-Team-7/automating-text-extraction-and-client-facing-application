@@ -1,7 +1,6 @@
 import os
 import dotenv
 
-import json, base64, io
 from PIL import Image
 
 from unstructured_ingest.v2.pipeline.pipeline import Pipeline
