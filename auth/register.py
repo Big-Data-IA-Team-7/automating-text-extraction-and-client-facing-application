@@ -5,11 +5,12 @@ load_dotenv()
 import os
 
 # Define the FastAPI URL for registration
-REGISTER_API_URL = os.getenv('REGISTER_API_URL')
+FAST_API_URL = os.getenv('FAST_API_DEV_URL')
 
 # Function for the registration page
 def register():
-    st.title("Register Page")
+    st.title("PDF Extractor Tool :page_with_curl:")
+    st.header("Register")
 
     # Create a form for user input
     with st.form(key='register_form'):
@@ -18,11 +19,16 @@ def register():
         submit_button = st.form_submit_button("Register")
         
         if submit_button:
+
+            payload = {
+                "username": new_username,
+                "password": new_password
+            }
             # Send a POST request to the FastAPI registration endpoint
-            response = requests.post(REGISTER_API_URL, data={"username": new_username, "password": new_password})
+            response = requests.post(f"{FAST_API_URL}/register/", json=payload)
 
             # Check the response
-            if response.status_code == 200:
+            if response.status_code == 201:
                 st.success("Registration successful!")
                 # Optionally, redirect or perform additional actions after successful registration
             elif response.status_code == 400:
@@ -30,8 +36,3 @@ def register():
             else:
                 st.error("An error occurred during registration.")
                 st.write(f"Response Content: {response.text}")  # Print response for debugging
-
-            
-    # Navigation to Login Page
-    if st.button("Go to Login"):
-        st.session_state.page = 'login'  # Switch back to login page

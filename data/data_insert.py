@@ -6,12 +6,13 @@
 import mysql.connector
 import pandas as pd
 from data.db_connection import get_db_connection
+from data.data_read import close_my_sql_connection
 from datetime import datetime
 from project_logging import logging_module
 
 def insert_user(username: str, password: str):
     """
-    Inserts a new user into the 'userlogin' table in the MySQL database.
+    Inserts a new user into the 'users_tbl' table in the MySQL database.
 
     Args:
         username (str): The username of the new user.
@@ -31,7 +32,7 @@ def insert_user(username: str, password: str):
             cursor = mydb.cursor()
 
             # Insert user into the database
-            cursor.execute("INSERT INTO userlogin (name, password) VALUES (%s, %s)", (username, password))
+            cursor.execute("INSERT INTO users_tbl (username, hashed_password) VALUES (%s, %s)", (username, password))
             mydb.commit()
 
             logging_module.log_success(f"User {username} registered successfully.")
@@ -47,10 +48,4 @@ def insert_user(username: str, password: str):
 
     finally:
         # Ensure that the cursor and connection are properly closed
-        try:
-            if mydb.is_connected():
-                cursor.close()
-                mydb.close()
-                logging_module.log_success("MySQL connection closed.")
-        except Exception as e:
-            logging_module.log_error(f"Error closing the MySQL connection: {e}")
+        close_my_sql_connection(mydb)
