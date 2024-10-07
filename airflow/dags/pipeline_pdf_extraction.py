@@ -1,10 +1,12 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
-from data_load.data_load import load_gaia_metadata_tbl 
-from data_load.pdf_extraction_open_source import process_all_pdfs_in_s3_directory
+from data_load.data_load import load_gaia_metadata_tbl
+from data_load.data_load import upload_gaia_files_to_s3_and_update_rds 
+from data_load.pdf_extraction_open_source import process_pdf_open_source
 from airflow.operators.bash import BashOperator
-from data_load.unstructured_file_extract import run_unstructured_pipeline
+#from data_load.unstructured_file_extract import run_unstructured_pipeline
+from data_load.update_url_froms3 import update_metadata_with_s3_urls
 
 
 
@@ -39,10 +41,17 @@ load_gaia_metadata_tbl = PythonOperator(
     dag=dag
 )
 
-process_pdfs_task = PythonOperator(
-        task_id='process_all_pdfs_in_s3_directory',
-        python_callable=process_all_pdfs_in_s3_directory,  # Reference the function
-        op_args=['gaia-dataset-assignment-2', 'gaia-dataset-assignment-2', 'Processing_files24'],  # Pass arguments here
+
+
+load_pdf_files_into_s3 = PythonOperator(
+    task_id='load_pdf_files_into_s3',
+    python_callable=upload_gaia_files_to_s3_and_update_rds,
+    dag=dag
+)
+
+process_pdfs_open_source_task = PythonOperator(
+        task_id='process_pdfs_open_source_task',
+        python_callable=process_pdf_open_source,  # Reference the function
         dag=dag
 )
 
@@ -58,6 +67,20 @@ process_pdfs_using_unstructured = BashOperator(
     dag=dag
 )
 
+update_s3url_open_source = PythonOperator(
+    task_id='update_s3url_open_source',
+    python_callable=update_metadata_with_s3_urls,
+    op_args=['open_source_processed/'],
+    dag=dag
+)
 
-load_gaia_metadata_tbl >> process_pdfs_task
-load_gaia_metadata_tbl >> process_pdfs_using_unstructured
+update_s3url_unstructured = PythonOperator(
+    task_id='update_s3url_unstructured',
+    python_callable=update_metadata_with_s3_urls,
+    op_args=['unstructured_extract/'],
+    dag=dag
+)
+
+load_gaia_metadata_tbl >> load_pdf_files_into_s3
+load_pdf_files_into_s3 >> process_pdfs_open_source_task >> update_s3url_open_source
+load_pdf_files_into_s3 >> process_pdfs_using_unstructured >> update_s3url_unstructured
