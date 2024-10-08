@@ -1,0 +1,25 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  fastapi:
+    build: .
+    command: uvicorn fastAPI:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network
+
+  streamlit:
+    build: .
+    command: streamlit run Home.py --server.port=8501 --server.enableCORS=false
+    ports:
+      - "8501:8501"
+    networks:
+      - app-network
+    depends_on:
+      - fastapi
+
+networks:
+  app-network:
+    driver: bridge
