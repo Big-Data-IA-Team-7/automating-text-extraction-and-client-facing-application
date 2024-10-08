@@ -3,6 +3,8 @@ from auth.login import login
 from auth.register import register
 from auth.logout import logout
 from features.pdf_extractor import pdf_extractor
+from dotenv import load_dotenv
+load_dotenv()
 
 # Initialize session state
 if "logged_in" not in st.session_state:

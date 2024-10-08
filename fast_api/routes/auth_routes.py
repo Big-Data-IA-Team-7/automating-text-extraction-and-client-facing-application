@@ -15,7 +15,7 @@ def register(request: RegisterUserRequest):
     user = fetch_user_from_db(username)
     if user is None:
         # Insert the user with the hashed password into the database
-        insert_user(username, hash_password(password))  # Ensure this function inserts hashed password
+        insert_user(first_name, username, hash_password(password))  # Ensure this function inserts hashed password
         return {"message": "User registered successfully"}
     else:
         raise HTTPException(
@@ -37,7 +37,11 @@ def login(request: LoginRequest):
         )
     if user.iloc[0]["username"] and user.iloc[0]["hashed_password"] == hash_password(password):
         token, expiration = create_jwt_token({"username": username})
-        return {"access_token": token, "token_type": "bearer", "expires": expiration.isoformat()}
+        return {"access_token": token,
+                "token_type": "bearer",
+                "expires": expiration.isoformat(),
+                "first_name": user.iloc[0]["first_name"]
+                }
     else:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

@@ -1,7 +1,5 @@
 import streamlit as st
 import requests
-from dotenv import load_dotenv
-load_dotenv()
 import os
 
 
@@ -18,6 +16,8 @@ def login():
         st.session_state.logged_in = False
     if 'token' not in st.session_state:
         st.session_state.token = None
+    if 'first_name' not in st.session_state:
+        st.session_state.first_name = None
 
     # Create a form for user input
     with st.form(key='login_form'):
@@ -37,12 +37,12 @@ def login():
             if response.status_code == 200:
                 data = response.json()
                 token = data.get("access_token")
+                first_name = data.get("first_name")
                 
                 st.success("Login successful!")
                 st.session_state.logged_in = True  # Update login status
                 st.session_state.token = token  # Store the token
-                st.session_state.username = username
-                st.session_state.page = 'login_user'  # Set the page to user login
+                st.session_state.first_name = first_name
                 st.rerun()  # Rerun the script to refresh the page
             elif response.status_code == 401:
                 st.error("Invalid credentials. Please try again.")

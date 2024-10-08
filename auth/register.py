@@ -1,7 +1,5 @@
 import streamlit as st
 import requests
-from dotenv import load_dotenv
-load_dotenv()
 import os
 
 # Define the FastAPI URL for registration
@@ -14,21 +12,23 @@ def register():
 
     # Create a form for user input
     with st.form(key='register_form'):
-        new_username = st.text_input("Enter the Username")
-        new_password = st.text_input("Enter the Password", type='password')
+        first_name = st.text_input("**Enter Your First Name**")
+        new_username = st.text_input("**Create Your Username**")
+        new_password = st.text_input("**Create Your Password**", type='password')
         submit_button = st.form_submit_button("Register")
         
         if submit_button:
 
             payload = {
                 "username": new_username,
-                "password": new_password
+                "password": new_password,
+                "first_name": first_name
             }
             # Send a POST request to the FastAPI registration endpoint
             response = requests.post(f"{FAST_API_URL}/auth/register/", json=payload)
 
             # Check the response
-            if response.status_code == 201:
+            if response.status_code == 200:
                 st.success("Registration successful!")
                 # Optionally, redirect or perform additional actions after successful registration
             elif response.status_code == 400:

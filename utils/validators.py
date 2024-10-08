@@ -1,12 +1,12 @@
 import json
 
 def answer_validation_check(final_answer: str, validation_answer: str):
-    final_answer = final_answer.strip().lower()
+    final_answer = final_answer.strip().lower().replace('"', '')
 
     if not validation_answer:
         return None
 
-    validation_answer = validation_answer.strip().lower().replace('`', '')
+    validation_answer = validation_answer.strip().lower()
 
     if final_answer.isdigit():
         validation_list = validation_answer.split()
