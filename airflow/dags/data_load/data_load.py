@@ -76,7 +76,7 @@ def load_gaia_metadata_tbl():
         create_table_query = """
         CREATE TABLE gaia_metadata_tbl_pdf (
             task_id VARCHAR(255),
-            Question VARCHAR(255),
+            Question TEXT,
             Level VARCHAR(3),
             final_answer VARCHAR(255),
             file_name VARCHAR(255),
