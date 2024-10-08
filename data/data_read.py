@@ -9,12 +9,12 @@ from data.db_connection import get_db_connection
 from datetime import datetime
 from project_logging import logging_module
 
-def fetch_user_data_from_db() -> pd.DataFrame:
+def fetch_user_from_db(username: str) -> pd.DataFrame:
     """
-    Fetches data from the 'user login' table in the MySQL database and returns it as a pandas DataFrame.
+    Fetches username from the 'users_tbl' table in the MySQL database and returns the username.
 
     Returns:
-        pd.DataFrame: A DataFrame containing the data fetched from the database, or None if an error occurs.
+        pd.DataFrame: A DataFrame containing the username and password fetched from the database, or None if an error occurs.
     """
     try:
         # Connect to MySQL database
@@ -27,20 +27,23 @@ def fetch_user_data_from_db() -> pd.DataFrame:
             mydata = mydb.cursor()
 
             # Execute the query
-            mydata.execute("SELECT * FROM userlogin")
+            mydata.execute("SELECT username, hashed_password FROM users_tbl WHERE username = %s", (username,))
             
-            # Fetch all the data
-            myresult = mydata.fetchall()
+            # Fetch only the username
+            user_data = mydata.fetchall()
 
-            logging_module.log_success("Fetched data from userlogin")
+            logging_module.log_success("Fetched data from users_tbl")
 
             # Get column names
             columns = [col[0] for col in mydata.description]
 
-            # Store the fetched data into a pandas DataFrame
-            df = pd.DataFrame(myresult, columns=columns)
-
-            return df
+            if user_data:
+                # Store the fetched data into a pandas DataFrame
+                user_df = pd.DataFrame(user_data, columns=columns)
+                return user_df
+            else:
+                logging_module.log_success("No user found with the provided username.")
+                return None
 
     except mysql.connector.Error as e:
         logging_module.log_error(f"Database error occurred: {e}")
@@ -52,17 +55,7 @@ def fetch_user_data_from_db() -> pd.DataFrame:
 
     finally:
         # Ensure that the cursor and connection are properly closed
-        try:
-            if mydb.is_connected():
-                mydata.close()
-                mydb.close()
-                logging_module.log_success("MySQL connection closed.")
-        except Exception as e:
-            logging_module.log_error(f"Error closing the MySQL connection: {e}")
-
-
-#Fetching the data for 'Gaia_metadata_tbl_pdf'
-
+        close_my_sql_connection(mydb, mydata)
 
 def fetch_data_from_db() -> pd.DataFrame:
     """
@@ -107,10 +100,13 @@ def fetch_data_from_db() -> pd.DataFrame:
 
     finally:
         # Ensure that the cursor and connection are properly closed
-        try:
-            if mydb.is_connected():
-                mydata.close()
-                mydb.close()
-                logging_module.log_success("MySQL connection closed.")
-        except Exception as e:
-            logging_module.log_error(f"Error closing the MySQL connection: {e}")
+        close_my_sql_connection(mydb, mydata)
+
+def close_my_sql_connection(mydb, mydata = None):
+    try:
+        if mydb.is_connected():
+            mydata.close()
+            mydb.close()
+            logging_module.log_success("MySQL connection closed.")
+    except Exception as e:
+        logging_module.log_error(f"Error closing the MySQL connection: {e}")
