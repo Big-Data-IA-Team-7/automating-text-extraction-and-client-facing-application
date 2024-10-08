@@ -32,7 +32,7 @@ def login():
             }
 
             # Send a POST request to the FastAPI login endpoint
-            response = requests.post(f"{FAST_API_URL}/login/", json=payload)
+            response = requests.post(f"{FAST_API_URL}/auth/login/", json=payload)
 
             if response.status_code == 200:
                 data = response.json()

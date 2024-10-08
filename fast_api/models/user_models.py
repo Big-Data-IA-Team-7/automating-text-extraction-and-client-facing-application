@@ -1,12 +1,6 @@
-# This Python script provides functions to connect to a MySQL database and fetch data into pandas DataFrames.
-# It includes a function to retrieve data from the 'userlogin' table, utilizing a separate database 
-# connection module. The script handles database connections, data retrieval, and logs the process using a 
-# logging module, ensuring that data fetching operations are monitored and recorded for debugging and auditing purposes.
-
 import mysql.connector
 import pandas as pd
-from data.db_connection import get_db_connection
-from datetime import datetime
+from fast_api.config.db_connection import close_my_sql_connection, get_db_connection
 from project_logging import logging_module
 
 def fetch_user_from_db(username: str) -> pd.DataFrame:
@@ -57,56 +51,42 @@ def fetch_user_from_db(username: str) -> pd.DataFrame:
         # Ensure that the cursor and connection are properly closed
         close_my_sql_connection(mydb, mydata)
 
-def fetch_data_from_db() -> pd.DataFrame:
+def insert_user(username: str, password: str):
     """
-    Fetches data from the 'user login' table in the MySQL database and returns it as a pandas DataFrame.
+    Inserts a new user into the 'users_tbl' table in the MySQL database.
 
-    Returns:
-        pd.DataFrame: A DataFrame containing the data fetched from the database, or None if an error occurs.
+    Args:
+        username (str): The username of the new user.
+        password (str): The password of the new user.
+
+    Raises:
+        ValueError: If the username already exists.
     """
     try:
         # Connect to MySQL database
         mydb = get_db_connection()
         
         if mydb.is_connected():
-            logging_module.log_success("Connected to the database for fetching data.")
+            logging_module.log_success("Connected to the database for inserting user data.")
 
             # Create a cursor object
-            mydata = mydb.cursor()
+            cursor = mydb.cursor()
 
-            # Execute the query
-            mydata.execute("SELECT * FROM gaia_metadata_tbl_pdf")
-            
-            # Fetch all the data
-            myresult = mydata.fetchall()
+            # Insert user into the database
+            cursor.execute("INSERT INTO users_tbl (username, hashed_password) VALUES (%s, %s)", (username, password))
+            mydb.commit()
 
-            logging_module.log_success("Fetched data from gaia_metadata_tbl_pdf")
-
-            # Get column names
-            columns = [col[0] for col in mydata.description]
-
-            # Store the fetched data into a pandas DataFrame
-            df = pd.DataFrame(myresult, columns=columns)
-
-            return df
+            logging_module.log_success(f"User {username} registered successfully.")
 
     except mysql.connector.Error as e:
-        logging_module.log_error(f"Database error occurred: {e}")
-        return None
+        # Handle duplicate username error
+        if e.errno == mysql.connector.errorcode.ER_DUP_ENTRY:
+            raise ValueError("Username already exists.")
+        logging_module.log_error(f"Database error occurred during user insertion: {e}")
 
     except Exception as e:
-        logging_module.log_error(f"An unexpected error occurred: {e}")
-        return None
+        logging_module.log_error(f"An unexpected error occurred during user insertion: {e}")
 
     finally:
         # Ensure that the cursor and connection are properly closed
-        close_my_sql_connection(mydb, mydata)
-
-def close_my_sql_connection(mydb, mydata = None):
-    try:
-        if mydb.is_connected():
-            mydata.close()
-            mydb.close()
-            logging_module.log_success("MySQL connection closed.")
-    except Exception as e:
-        logging_module.log_error(f"Error closing the MySQL connection: {e}")
+        close_my_sql_connection(mydb)

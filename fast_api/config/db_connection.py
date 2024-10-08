@@ -5,8 +5,7 @@
 
 import os
 import mysql.connector
-from dotenv import load_dotenv
-load_dotenv()
+from project_logging import logging_module
 
 # Getting in Environmental variables
 aws_rds_host=os.getenv('AWS_RDS_HOST')
@@ -29,3 +28,12 @@ def get_db_connection() -> mysql.connector.connection_cext.CMySQLConnection:
         port =aws_rds_port,
         database=aws_rds_database
     )
+
+def close_my_sql_connection(mydb, mydata = None):
+    try:
+        if mydb.is_connected():
+            mydata.close()
+            mydb.close()
+            logging_module.log_success("MySQL connection closed.")
+    except Exception as e:
+        logging_module.log_error(f"Error closing the MySQL connection: {e}")
