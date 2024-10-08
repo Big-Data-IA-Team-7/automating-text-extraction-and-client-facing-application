@@ -38,6 +38,7 @@ def handle_file_processing(question_selected, dataframe, headers):
     loaded_file = fetch_download_url(FAST_API_URL, question_selected, dataframe, headers)
     if loaded_file:
         download_fragment(loaded_file["path"])
+        os.remove(loaded_file["path"])
 
 def handle_wrong_answer_flow(data_frame, question_selected, validate_answer, model, headers, question_contents):
     steps = data_frame[data_frame['Question'] == question_selected]['Annotator_Metadata'].iloc[0]
@@ -132,9 +133,11 @@ def pdf_extractor():
                 if st.session_state.unstructured_ask_gpt_clicked:
                     loaded_file = fetch_download_url(FAST_API_URL, question_selected, data, headers, 'U')
                     file_contents = extract_json_contents(loaded_file["path"])
+                    os.remove(loaded_file["path"])
                 else:
                     loaded_file = fetch_download_url(FAST_API_URL, question_selected, data, headers, 'P')
                     file_contents = extract_txt_contents(loaded_file["path"])
+                    os.remove(loaded_file["path"])
                 
                 question_contents = question_selected + 'Context:```' + file_contents + "```"
                 payload = {

@@ -161,14 +161,18 @@ def download_file(question: str, df: pd.DataFrame, extraction_method: str = None
     path = unquote(parsed_url.path)
     filename = os.path.basename(path)
     extension = os.path.splitext(filename)[1]
-    
-    # Create a temporary file with the correct extension
-    temp = tempfile.NamedTemporaryFile(delete=False, suffix=extension)
-    
+
+    # Create a temporary directory to hold the file
+    temp_dir = "/code/temp_files"
+    os.makedirs(temp_dir, exist_ok=True)
+
+    # Create a temporary file in the specified directory
+    temp = tempfile.NamedTemporaryFile(delete=False, suffix=extension, dir=temp_dir)
+
     # Get the file from the URL
     response = requests.get(file_name)
     response.raise_for_status()  # Check if the download was successful
-    
+
     # Write the content to the temporary file
     temp.write(response.content)
     temp.close()  # Close the file to finalize writing
