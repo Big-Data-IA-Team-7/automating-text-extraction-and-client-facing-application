@@ -1,6 +1,5 @@
 import requests
 import pandas as pd
-import json
 from project_logging import logging_module
 
 def fetch_questions(api_url, headers):

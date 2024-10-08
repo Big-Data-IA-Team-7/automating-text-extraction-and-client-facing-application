@@ -21,7 +21,7 @@ def fetch_user_from_db(username: str) -> pd.DataFrame:
             mydata = mydb.cursor()
 
             # Execute the query
-            mydata.execute("SELECT username, hashed_password FROM users_tbl WHERE username = %s", (username,))
+            mydata.execute("SELECT first_name, username, hashed_password FROM users_tbl WHERE username = %s", (username,))
             
             # Fetch only the username
             user_data = mydata.fetchall()
@@ -51,7 +51,7 @@ def fetch_user_from_db(username: str) -> pd.DataFrame:
         # Ensure that the cursor and connection are properly closed
         close_my_sql_connection(mydb, mydata)
 
-def insert_user(username: str, password: str):
+def insert_user(first_name: str, username: str, password: str):
     """
     Inserts a new user into the 'users_tbl' table in the MySQL database.
 
@@ -73,7 +73,7 @@ def insert_user(username: str, password: str):
             cursor = mydb.cursor()
 
             # Insert user into the database
-            cursor.execute("INSERT INTO users_tbl (username, hashed_password) VALUES (%s, %s)", (username, password))
+            cursor.execute("INSERT INTO users_tbl (first_name, username, hashed_password) VALUES (%s, %s, %s)", (first_name, username, password))
             mydb.commit()
 
             logging_module.log_success(f"User {username} registered successfully.")
