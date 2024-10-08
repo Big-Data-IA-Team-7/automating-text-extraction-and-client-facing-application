@@ -57,7 +57,6 @@ def fetch_user_from_db(username: str) -> pd.DataFrame:
         # Ensure that the cursor and connection are properly closed
         close_my_sql_connection(mydb, mydata)
 
-#Fetching the data for 'Gaia_metadata_tbl_pdf'
 def fetch_data_from_db() -> pd.DataFrame:
     """
     Fetches data from the 'user login' table in the MySQL database and returns it as a pandas DataFrame.
@@ -102,7 +101,6 @@ def fetch_data_from_db() -> pd.DataFrame:
     finally:
         # Ensure that the cursor and connection are properly closed
         close_my_sql_connection(mydb, mydata)
-
 
 def close_my_sql_connection(mydb, mydata = None):
     try:
