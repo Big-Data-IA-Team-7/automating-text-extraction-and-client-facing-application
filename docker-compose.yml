@@ -20,6 +20,7 @@ services:
       - .env
     volumes:
       - .:/code
+      - ./temp_files:/code/temp_files 
     networks:
       - app_network
 
