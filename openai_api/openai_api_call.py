@@ -16,14 +16,14 @@ class OpenAIClient:
 
         # System content strings
         self.val_system_content = """Every prompt will begin with the text \"Question:\" followed by the question \
-enclosed in triple backticks. The text \"Output Format:\" explains how the Question \
-must be answered. You are an AI that reads the Question enclosed in triple backticks \
-and provides the answer in the mentioned Output Format."""
+enclosed in triple backticks. The text \"Context:\" followed by the contents of the pdf file is enclosed in triple backticks. \
+The text \"Output Format:\" explains how the Question must be answered. You are an AI that reads the Question enclosed 
+in triple backticks and provides the answer in the mentioned Output Format."""
 
         self.ann_system_content = """Every prompt will begin with the text \"Question:\" followed by the question \
-enclosed in triple backticks. The \"Annotator Steps:\" mentions the steps that you should take \
-for answering the question. The text \"Output Format:\" explains how the Question \
-output must be formatted. You are an AI that reads the Question enclosed in triple backticks \
+enclosed in triple backticks. The text \"Context:\" followed by the contents of the pdf file is enclosed in triple backticks. \
+The \"Annotator Steps:\" mentions the steps that you should take for answering the question. The text \"Output Format:\" \
+explains how the Question output must be formatted. You are an AI that reads the Question enclosed in triple backticks \
 and follows the Annotator Steps and provides the answer in the mentioned Output Format."""
 
         self.output_format = "Provide a clear and conclusive answer to the Question being asked. Do not provide any \

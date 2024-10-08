@@ -65,7 +65,7 @@ def generate_presigned_url(s3_url: str, expiration: int = 3600) -> str:
         logging_module.log_error(f"Error generating pre-signed URL: {e}")
         return None
 
-def process_data_and_generate_url(question: str, df) -> str:
+def process_data_and_generate_url(question: str, df, extraction_method: str = None) -> str:
     """
     Fetches data from the database, extracts the S3 URL for the specified question, and generates a pre-signed URL if available.
 
@@ -76,31 +76,36 @@ def process_data_and_generate_url(question: str, df) -> str:
         str: A pre-signed URL for the S3 file if available.
     """
     if df is not None:
-        if 's3_url' in df.columns:
-            # Extract the S3 URL for the specified Question
-            matching_rows = df[df['Question'] == question]
-            if not matching_rows.empty:
+        # Extract the S3 URL for the specified Question
+        matching_rows = df[df['Question'] == question]
+        if not matching_rows.empty:
+            if extraction_method == 'U':
+                s3_url_variable = matching_rows['unstructured_api_url'].values[0]
+                print("S3 URL: ", s3_url_variable)
+                logging_module.log_success(f"Unstructured S3 URL: {s3_url_variable}")
+            elif extraction_method == 'P':
+                s3_url_variable = matching_rows['opensource_url'].values[0]
+                logging_module.log_success(f"PyMuPDF S3 URL: {s3_url_variable}")
+            else:
                 s3_url_variable = matching_rows['s3_url'].values[0]
                 logging_module.log_success(f"S3 URL: {s3_url_variable}")
 
-                # Check if s3_url_variable is null
-                if s3_url_variable is not None:
-                    # Generate a pre-signed URL for the S3 file
-                    presigned_url = generate_presigned_url(s3_url_variable, expiration=3600)  # URL valid for 1 hour
-                    return presigned_url
-                else:
-                    logging_module.log_success("No File is associated with this Question")
-                    return "1"
+            # Check if s3_url_variable is null
+            if s3_url_variable is not None:
+                # Generate a pre-signed URL for the S3 file
+                presigned_url = generate_presigned_url(s3_url_variable, expiration=3600)  # URL valid for 1 hour
+                return presigned_url
             else:
-                logging_module.log_error("No matching Question found")
-                return "1"
+                logging_module.log_success("No File is associated with this Question")
+                return None
         else:
-            logging_module.log_error("'s3_url' column not found in DataFrame")
-            return "1"
+            logging_module.log_error("No matching Question found")
+            return None
     else:
         logging_module.log_error("Failed to fetch data from the database")
+        return None
  
-def download_file(question: str, df: pd.DataFrame) -> dict:
+def download_file(question: str, df: pd.DataFrame, extraction_method: str = None) -> dict:
     """
     Downloads a file from the given URL and saves it as a temporary file with the appropriate extension.
 
@@ -114,7 +119,7 @@ def download_file(question: str, df: pd.DataFrame) -> dict:
             - "extension" (str): The file extension of the downloaded file.
     """
     # Parse the URL to extract the file name
-    file_name = process_data_and_generate_url(question, df)
+    file_name = process_data_and_generate_url(question, df, extraction_method)
     parsed_url = urlparse(file_name)
     path = unquote(parsed_url.path)
     filename = os.path.basename(path)

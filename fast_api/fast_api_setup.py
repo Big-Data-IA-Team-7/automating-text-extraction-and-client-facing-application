@@ -32,6 +32,7 @@ class RegisterUserRequest(BaseModel):
 class DownloadRequest(BaseModel):
     question: str
     df: List[Dict]
+    extraction_method: str
 
 class OpenAIRequest(BaseModel):
     model: str = Field(..., min_length=3, max_length=15, description="The model to send the request to")
@@ -101,8 +102,6 @@ def login(request: LoginRequest):
     username = request.username
     password = request.password
     user = fetch_user_from_db(username)
-    print(user["username"])
-    print(user["hashed_password"])
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -165,8 +164,11 @@ def get_download_url(request: DownloadRequest, current_user: Dict = Depends(get_
         # Convert the request df back to a DataFrame
     df = pd.DataFrame(request.df)
     question = request.question
+    extraction_method = request.extraction_method
 
-    download_url = download_file(question, df)
+    logging_module.log_success(f"Question: {question}, Extraction Method: {extraction_method}")
+
+    download_url = download_file(question, df, extraction_method)
                   
     return download_url
 
@@ -174,7 +176,7 @@ def get_download_url(request: DownloadRequest, current_user: Dict = Depends(get_
 def get_openai_response(request: OpenAIRequest, current_user: Dict = Depends(get_current_user)):
     
     # Log the user who is making the request
-    logging_module.log_success(f"User '{current_user['username']}' is fetching data from the database.")
+    logging_module.log_success(f"User '{current_user['username']}' is sending request to OpenAI.")
 
     question_selected = request.question_selected
     model = request.model
@@ -185,3 +187,6 @@ def get_openai_response(request: OpenAIRequest, current_user: Dict = Depends(get
     response = client.validation_prompt(question_selected, model, annotated_steps)
 
     return response
+
+
+
