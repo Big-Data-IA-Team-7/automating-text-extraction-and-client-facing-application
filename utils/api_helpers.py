@@ -4,7 +4,7 @@ import json
 from project_logging import logging_module
 
 def fetch_questions(api_url, headers):
-    response = requests.get(f"{api_url}/fetch-questions/", headers=headers)
+    response = requests.get(f"{api_url}/data/fetch-questions/", headers=headers)
     if response.status_code == 200:
         return pd.DataFrame(response.json())
     else:
@@ -18,11 +18,11 @@ def fetch_download_url(api_url, question_selected, dataframe, headers, extractio
         "df": df_json,
         "extraction_method": extraction_method
     }
-    response = requests.get(f"{api_url}/fetch-download-url/", json=payload, headers=headers)
+    response = requests.get(f"{api_url}/data/fetch-download-url/", json=payload, headers=headers)
     return response.json() if response.status_code == 200 else None
 
 def fetch_openai_response(api_url, payload, headers):
-    response = requests.get(f"{api_url}/fetch-openai-response/", json=payload, headers=headers)
+    response = requests.get(f"{api_url}/openai/fetch-openai-response/", json=payload, headers=headers)
     if response.status_code == 200:
         return response.text
     else:

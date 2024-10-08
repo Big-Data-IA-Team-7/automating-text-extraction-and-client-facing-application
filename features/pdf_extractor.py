@@ -31,7 +31,8 @@ def user_validation_buttons(data, question_selected, validate_answer, model_chos
     if st.session_state.incorrect_response_clicked:
         gpt_steps(data, question_selected, validate_answer, model_chosen, headers, question_contents)
     elif st.session_state.correct_response_clicked:
-        insert_model_response(task_id_sel, datetime.now().date(), model_chosen, ai_response, 'correct as-is')
+        # Handle insert into db here
+        pass
 
 def handle_file_processing(question_selected, dataframe, headers):
     loaded_file = fetch_download_url(FAST_API_URL, question_selected, dataframe, headers)
