@@ -20,4 +20,6 @@ class DownloadRequest(BaseModel):
 class OpenAIRequest(BaseModel):
     model: str = Field(..., min_length=3, max_length=15, description="The model to send the request to")
     question_selected: str = Field(..., description="The question selected by the user")
+    file_extract: bool = Field(None, description="Boolean to determine whether file extract API must be used or not (optional)")
     annotated_steps: str = Field(None, description="The annotated steps if any for the question (optional)")
+    loaded_file: Dict = Field(None, description="The file to be loaded with OpenAI")

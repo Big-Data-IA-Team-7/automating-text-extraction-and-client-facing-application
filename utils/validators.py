@@ -1,4 +1,5 @@
 import json
+import tiktoken
 
 def answer_validation_check(final_answer: str, validation_answer: str):
     final_answer = final_answer.strip().lower().replace('"', '')
@@ -30,3 +31,9 @@ def extract_txt_contents(file_path):
         file_content = file.read()
 
         return file_content
+
+def num_tokens_from_string(question_contents: str, model: str) -> int:
+    """Returns the number of tokens in a text string."""
+    encoding = tiktoken.encoding_for_model(model)
+    num_tokens = len(encoding.encode(question_contents))
+    return num_tokens

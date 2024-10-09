@@ -4,7 +4,9 @@ import json
 from dotenv import load_dotenv
 from utils.session_helpers import declare_session_state, buttons_reset, buttons_set
 from utils.api_helpers import fetch_questions, fetch_download_url, fetch_openai_response
-from utils.validators import answer_validation_check, extract_json_contents, extract_txt_contents
+from utils.validators import answer_validation_check, extract_json_contents, extract_txt_contents, num_tokens_from_string
+from project_logging import logging_module
+import time
 
 load_dotenv()
 
@@ -102,56 +104,74 @@ def pdf_extractor():
         model_options = ["GPT-4o", "GPT-4", "GPT-3.5-turbo"]
 
         if question_selected:
-            st.text_area("**Selected Question**:", question_selected)
-            validate_answer = data[data['Question'] == question_selected]['final_answer'].iloc[0]
-            if validate_answer == '?':
-                st.write("**No answer provided for this question**")
-                validate_answer = None
-            else:
-                st.text_input("**Selected Question Answer is:**", validate_answer)
-
-            handle_file_processing(question_selected, data, headers)
-
-            model_chosen = st.selectbox("**Model**",
-                                        options=model_options,
-                                        on_change=buttons_reset,
-                                        args=("unstructured_ask_gpt_clicked", "pymupdf_ask_gpt_clicked")
-                                    )
-            
-            unstructured_col, pymupdf_col = st.columns(2)
-            unstructured_col.button("**Ask GPT - Extraction Using Unstructured**",
-                                    on_click=buttons_set,
-                                    args=("unstructured_ask_gpt_clicked",))
-            pymupdf_col.button("**Ask GPT - Extraction Using PyMuPDF**",
-                               on_click=buttons_set,
-                               args=("pymupdf_ask_gpt_clicked",))
-
-            if st.session_state.unstructured_ask_gpt_clicked or st.session_state.pymupdf_ask_gpt_clicked:
-                
-                buttons_reset("incorrect_response_clicked", "correct_response_clicked")
-
-                if st.session_state.unstructured_ask_gpt_clicked:
-                    loaded_file = fetch_download_url(FAST_API_URL, question_selected, data, headers, 'U')
-                    file_contents = extract_json_contents(loaded_file["path"])
-                    os.remove(loaded_file["path"])
+            try:
+                st.text_area("**Selected Question**:", question_selected)
+                validate_answer = data[data['Question'] == question_selected]['final_answer'].iloc[0]
+                if validate_answer == '?':
+                    st.write("**No answer provided for this question**")
+                    validate_answer = None
                 else:
-                    loaded_file = fetch_download_url(FAST_API_URL, question_selected, data, headers, 'P')
-                    file_contents = extract_txt_contents(loaded_file["path"])
-                    os.remove(loaded_file["path"])
-                
-                question_contents = question_selected + 'Context:```' + file_contents + "```"
-                payload = {
-                    "question_selected": question_contents,
-                    "model": model_chosen
-                }
-                ai_response = fetch_openai_response(FAST_API_URL, payload, headers)
+                    st.text_input("**Selected Question Answer is:**", validate_answer)
 
-                if ai_response:
-                    st.write(f"**LLM Response:** {ai_response}")
-                    answer_check = answer_validation_check(ai_response, validate_answer)
-                    if answer_check == 1:
-                        st.error("Sorry, GPT predicted the wrong answer. Do you need the steps?")
-                    elif answer_check == 2:
-                        st.success("GPT predicted the correct answer.")
-                    user_validation_buttons(data, question_selected, validate_answer, 
-                                            model_chosen, headers, ai_response, question_contents)
+                handle_file_processing(question_selected, data, headers)
+
+                model_chosen = st.selectbox("**Model**",
+                                            options=model_options,
+                                            on_change=buttons_reset,
+                                            args=("unstructured_ask_gpt_clicked", "pymupdf_ask_gpt_clicked")
+                                        )
+                
+                unstructured_col, pymupdf_col = st.columns(2)
+                
+                unstructured_col.button("**Ask GPT - Extraction Using Unstructured**",
+                                        on_click=buttons_set,
+                                        args=("unstructured_ask_gpt_clicked",))
+                pymupdf_col.button("**Ask GPT - Extraction Using PyMuPDF**",
+                                on_click=buttons_set,
+                                args=("pymupdf_ask_gpt_clicked",))
+
+                if st.session_state.unstructured_ask_gpt_clicked or st.session_state.pymupdf_ask_gpt_clicked:
+                    
+                    buttons_reset("incorrect_response_clicked", "correct_response_clicked")
+
+                    if st.session_state.unstructured_ask_gpt_clicked:
+                        loaded_file = fetch_download_url(FAST_API_URL, question_selected, data, headers, 'U')
+                        file_contents = extract_json_contents(loaded_file["path"])
+                    else:
+                        loaded_file = fetch_download_url(FAST_API_URL, question_selected, data, headers, 'P')
+                        file_contents = extract_txt_contents(loaded_file["path"])
+                    
+                    question_contents = question_selected + 'Context:```' + file_contents + "```"
+
+                    num_tokens = num_tokens_from_string(question_contents, model_chosen.lower())
+                    
+                    if num_tokens > 60000:
+                        payload = {
+                            "question_selected": question_selected,
+                            "model": model_chosen,
+                            "file_extract": True,
+                            "loaded_file": loaded_file
+                        }
+                    else:
+                        payload = {
+                            "question_selected": question_contents,
+                            "model": model_chosen
+                        }
+                    
+                    ai_response = fetch_openai_response(FAST_API_URL, payload, headers)
+                    os.remove(loaded_file["path"])
+
+                    if ai_response:
+                        st.write(f"**LLM Response:** {ai_response}")
+                        answer_check = answer_validation_check(ai_response, validate_answer)
+                        if answer_check == 1:
+                            st.error("Sorry, GPT predicted the wrong answer. Do you need the steps?")
+                        elif answer_check == 2:
+                            st.success("GPT predicted the correct answer.")
+                        user_validation_buttons(data, question_selected, validate_answer, 
+                                                model_chosen, headers, ai_response, question_contents)
+            except Exception as e:
+                logging_module.log_error(f"An error occurred: {str(e)}")
+                "An unexpected error occurred: App is being refreshed..."
+                time.sleep(2)
+                st.rerun()
