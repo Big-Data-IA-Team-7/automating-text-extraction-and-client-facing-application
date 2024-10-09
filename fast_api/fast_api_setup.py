@@ -1,8 +1,5 @@
 from .routes import auth_routes, data_routes, openai_routes
 from fastapi import FastAPI
-from dotenv import load_dotenv
-
-load_dotenv()
 
 # Create FastAPI instance
 app = FastAPI()

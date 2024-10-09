@@ -9,15 +9,12 @@ import requests
 import tempfile
 from project_logging import logging_module
 import pandas as pd
-
-# AWS credentials
-aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
-aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+from parameter_config import ACCESS_KEY_ID_AWS, SECRET_ACCESS_KEY_AWS
 
 # Initialize S3 client
 s3 = boto3.client('s3',
-                  aws_access_key_id=aws_access_key_id,
-                  aws_secret_access_key=aws_secret_access_key)
+                  aws_access_key_id=ACCESS_KEY_ID_AWS,
+                  aws_secret_access_key=SECRET_ACCESS_KEY_AWS)
 
 def fetch_data_from_db() -> pd.DataFrame:
     """

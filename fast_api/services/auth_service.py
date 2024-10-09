@@ -4,12 +4,12 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from datetime import datetime, timedelta, timezone
 from fast_api.models.user_models import fetch_user_from_db
 from project_logging import logging_module
+from parameter_config import SECRET_KEY
 
-encoded_key = os.getenv('SECRET_KEY')
 security = HTTPBearer()
 
 def hash_password(password: str) -> str:
-    secret_key = base64.b64decode(encoded_key)
+    secret_key = base64.b64decode(SECRET_KEY)
     hash_object = hmac.new(secret_key, msg=password.encode(), digestmod=hashlib.sha256)
     hash_hex = hash_object.hexdigest()
     return hash_hex
@@ -17,12 +17,12 @@ def hash_password(password: str) -> str:
 def create_jwt_token(data: dict):
     expiration = datetime.now(timezone.utc) + timedelta(minutes=50)
     token_payload = {"exp": expiration, **data}
-    token = jwt.encode(token_payload, encoded_key, algorithm='HS256')
+    token = jwt.encode(token_payload, SECRET_KEY, algorithm='HS256')
     return token, expiration
 
 def decode_jwt_token(token: str):
     try:
-        decoded_token = jwt.decode(token, encoded_key, algorithms=["HS256"])
+        decoded_token = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
         return decoded_token
     except jwt.ExpiredSignatureError:
         raise HTTPException(

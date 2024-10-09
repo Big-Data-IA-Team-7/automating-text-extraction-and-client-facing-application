@@ -1,10 +1,6 @@
 import streamlit as st
 import requests
-import os
-
-
-# Define the FastAPI URL for login
-FAST_API_URL = os.getenv('FAST_API_DEV_URL')
+from parameter_config import FAST_API_DEV_URL
 
 # Function for the login page
 def login():
@@ -32,7 +28,7 @@ def login():
             }
 
             # Send a POST request to the FastAPI login endpoint
-            response = requests.post(f"{FAST_API_URL}/auth/login/", json=payload)
+            response = requests.post(f"{FAST_API_DEV_URL}/auth/login/", json=payload)
 
             if response.status_code == 200:
                 data = response.json()

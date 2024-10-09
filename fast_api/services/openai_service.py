@@ -6,13 +6,14 @@
 import openai
 from openai import OpenAI
 from project_logging import logging_module
+from parameter_config import OPENAI_API_KEY
 
 class OpenAIClient:
     def __init__(self):
         """
         Initializes the OpenAIClient with all system prompts.
         """
-        self.client = OpenAI()  # Initialize OpenAI client
+        self.client = OpenAI(api_key=OPENAI_API_KEY)  # Initialize OpenAI client
 
         # System content strings
         self.val_system_content = """Every prompt will begin with the text \"Question:\" followed by the question \

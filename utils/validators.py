@@ -9,11 +9,11 @@ def answer_validation_check(final_answer: str, validation_answer: str):
 
     validation_answer = validation_answer.strip().lower()
 
-    if final_answer.isdigit():
-        validation_list = validation_answer.split()
-        return 1 if final_answer not in validation_list else 2
+    if validation_answer.isdigit():
+        final_list = final_answer.split()
+        return 1 if validation_answer not in final_list else 2
     else:
-        return 1 if final_answer not in validation_answer else 2
+        return 1 if validation_answer not in final_answer else 2
 
 def extract_json_contents(file_path):
     with open(file_path, 'r') as file:
