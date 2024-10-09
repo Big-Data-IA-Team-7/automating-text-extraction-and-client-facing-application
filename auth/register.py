@@ -1,9 +1,6 @@
 import streamlit as st
 import requests
-import os
-
-# Define the FastAPI URL for registration
-FAST_API_URL = os.getenv('FAST_API_DEV_URL')
+from parameter_config import FAST_API_DEV_URL
 
 # Function for the registration page
 def register():
@@ -25,7 +22,7 @@ def register():
                 "first_name": first_name
             }
             # Send a POST request to the FastAPI registration endpoint
-            response = requests.post(f"{FAST_API_URL}/auth/register/", json=payload)
+            response = requests.post(f"{FAST_API_DEV_URL}/auth/register/", json=payload)
 
             # Check the response
             if response.status_code == 200:

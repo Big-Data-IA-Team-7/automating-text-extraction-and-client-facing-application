@@ -4,8 +4,6 @@ services:
     ports:
       - '8000:8000'
     command: uvicorn fast_api.fast_api_setup:app --host 0.0.0.0 --port 8000 --reload
-    env_file:
-      - .env
     volumes:
       - .:/code
     networks:
@@ -16,8 +14,6 @@ services:
     ports:
       - '8501:8501'
     command: streamlit run streamlit_app.py --server.port 8501
-    env_file:
-      - .env
     volumes:
       - .:/code
       - ./temp_files:/code/temp_files 

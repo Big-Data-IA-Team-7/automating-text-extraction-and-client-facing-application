@@ -1,17 +1,12 @@
 import streamlit as st
 import os
 import json
-from dotenv import load_dotenv
 from utils.session_helpers import declare_session_state, buttons_reset, buttons_set
 from utils.api_helpers import fetch_questions, fetch_download_url, fetch_openai_response
 from utils.validators import answer_validation_check, extract_json_contents, extract_txt_contents, num_tokens_from_string
 from project_logging import logging_module
 import time
-
-load_dotenv()
-
-#Fetching the Data 
-FAST_API_URL = os.getenv('FAST_API_DEV_URL')
+from parameter_config import FAST_API_DEV_URL
 
 @st.fragment
 def download_fragment(file_name: str) -> None:
@@ -37,7 +32,7 @@ def user_validation_buttons(data, question_selected, validate_answer, model_chos
         pass
         
 def handle_file_processing(question_selected, dataframe, headers):
-    loaded_file = fetch_download_url(FAST_API_URL, question_selected, dataframe, headers)
+    loaded_file = fetch_download_url(FAST_API_DEV_URL, question_selected, dataframe, headers)
     if loaded_file:
         download_fragment(loaded_file["path"])
         os.remove(loaded_file["path"])
@@ -60,7 +55,7 @@ def handle_wrong_answer_flow(data_frame, question_selected, validate_answer, mod
             "model": model,
             "annotated_steps": st.session_state.steps_text,
         }
-        ann_ai_response = fetch_openai_response(FAST_API_URL, payload, headers)
+        ann_ai_response = fetch_openai_response(FAST_API_DEV_URL, payload, headers)
 
         if ann_ai_response:
             st.write(f"**LLM Response**: {ann_ai_response}")
@@ -81,7 +76,7 @@ def pdf_extractor():
     st.title(f":wave: Hello, {st.session_state.first_name}")
 
     headers = {"Authorization": f"Bearer {st.session_state.token}"}
-    data = fetch_questions(FAST_API_URL, headers)
+    data = fetch_questions(FAST_API_DEV_URL, headers)
 
     if data is not None:
         with st.sidebar:
@@ -135,10 +130,10 @@ def pdf_extractor():
                     buttons_reset("incorrect_response_clicked", "correct_response_clicked")
 
                     if st.session_state.unstructured_ask_gpt_clicked:
-                        loaded_file = fetch_download_url(FAST_API_URL, question_selected, data, headers, 'U')
+                        loaded_file = fetch_download_url(FAST_API_DEV_URL, question_selected, data, headers, 'U')
                         file_contents = extract_json_contents(loaded_file["path"])
                     else:
-                        loaded_file = fetch_download_url(FAST_API_URL, question_selected, data, headers, 'P')
+                        loaded_file = fetch_download_url(FAST_API_DEV_URL, question_selected, data, headers, 'P')
                         file_contents = extract_txt_contents(loaded_file["path"])
                     
                     question_contents = question_selected + 'Context:```' + file_contents + "```"
@@ -158,7 +153,7 @@ def pdf_extractor():
                             "model": model_chosen
                         }
                     
-                    ai_response = fetch_openai_response(FAST_API_URL, payload, headers)
+                    ai_response = fetch_openai_response(FAST_API_DEV_URL, payload, headers)
                     os.remove(loaded_file["path"])
 
                     if ai_response:
