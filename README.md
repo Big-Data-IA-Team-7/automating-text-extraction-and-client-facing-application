@@ -9,9 +9,9 @@ This project automates the extraction of text from PDF files using two different
 ## Project Resources
 
 - **Google Codelab**: [Codelab Link](https://codelabs-preview.appspot.com/?file_id=18miWKQAQ-EmqhbfCJc3A3ZqL-mmLPrhl1bHLGDUTXeY)
-- **App (Deployed  on AWS EC2)**: [Streamlit Link](http://75.101.133.31:8501/)
+- **App (Deployed on AWS EC2)**: [Streamlit Link](http://75.101.133.31:8501/)
 - **Airflow (Deployed on AWS EC2)**: [Airflow Link](http://75.101.133.31:8080/)
-- **YouTube Demo**: [Demo Link](#)
+- **YouTube Demo**: [Demo Link](https://www.youtube.com/watch?v=RE07uCmvzho)
 
 ## Technologies
 
@@ -29,32 +29,33 @@ This project automates the extraction of text from PDF files using two different
 ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON-web-tokens&logoColor=white)
 ![Airflow](https://img.shields.io/badge/Airflow-017CEE?style=for-the-badge&logo=apache-airflow&logoColor=white)
 
-
 ## Architecture Diagram
 
 ![flow_diagram](https://github.com/user-attachments/assets/4d9323d3-155e-40a9-8f91-8d25b2cb4c6e)
 
-
 ## Project Flow
 
 ### Step 1: PDF Processing
+
 - The system processes PDF files using two approaches:
-    - **Open-Source Tools** (PyMuPDF): Converts PDFs into markdown and extracts images.
-    - **Unstructured API**: Processes large PDFs using a custom pipeline with high concurrency, capable of handling complex document structures.
+  - **Open-Source Tools** (PyMuPDF): Converts PDFs into markdown and extracts images.
+  - **Unstructured API**: Processes large PDFs using a custom pipeline with high concurrency, capable of handling complex document structures.
 
 ### Step 2: Data Storage and Management
+
 - **S3 Buckets**: Stores the original PDFs and the processed outputs (markdown, images, JSON).
 - **RDS (MySQL)**: Manages the metadata for the PDFs and processed files, allowing efficient querying and updates.
 
 ### Step 3: Client Interaction via Streamlit
+
 - Users access the processed data through the Streamlit interface, which provides features to:
-    - Upload new PDFs.
-    - View and download extracted content.
-    - Analyze the metadata and processed data.
+  - Upload new PDFs.
+  - View and download extracted content.
+  - Analyze the metadata and processed data.
 
 ### Step 4: AI Integration
-- **OpenAI GPT Model**: Used to handle natural language queries on the extracted data, providing insights based on the document content.
 
+- **OpenAI GPT Model**: Used to handle natural language queries on the extracted data, providing insights based on the document content.
 
 ## How to Run the application
 
@@ -69,7 +70,7 @@ OPEN_AI_API_KEY: <your-open-ai-api-key>
 # Dockerize the application
 
 docker build -t ramkumarrp16077/airflow-image:latest .
- 
+
 #create tage and then push
 docker push ramkumarrp16077/airflow-image:latest
 
@@ -92,11 +93,6 @@ docker run -d -p 8080:8080 ramkumarrp16077/airflow-image:latest
 Access the Application
 http://75.101.133.31:8080 for Airflow
 http://75.101.133.31:8501 for Streamlit
-
-
-
-
-
 
 ## Repository Structure
 
@@ -181,14 +177,13 @@ AUTOMATING-TEXT-EXTRACTION/
 
 ```
 
-
 ## Contributions
 
-| Name                      | Contribution                                                           |
-|---------------------------|------------------------------------------------------------------------|
-| **Pragnesh Anekal**        | 33% - OpenAI API integration, Streamlit integration with API, FAST API, JWT Keys, Unstructured API  , Deployment          |
-| **Ram Kumar Ramasamy Pandiaraj** | 33% - Loading data from Hugging Face to S3, Open Source PDF Extraction, Docker, Airflow DAGs, Deployment   |
-| **Dipen Manoj Patel**      | 33% - Streamlit UI for Predicting Page, User Registration and Authentication,  Dockerizing Fast API, Validating Answers flow, reading data from DB |
+| Name                             | Contribution                                                                                                                                      |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Pragnesh Anekal**              | 33% - OpenAI API integration, Streamlit integration with API, FAST API, JWT Keys, Unstructured API , Deployment                                   |
+| **Ram Kumar Ramasamy Pandiaraj** | 33% - Loading data from Hugging Face to S3, Open Source PDF Extraction, Docker, Airflow DAGs, Deployment                                          |
+| **Dipen Manoj Patel**            | 33% - Streamlit UI for Predicting Page, User Registration and Authentication, Dockerizing Fast API, Validating Answers flow, reading data from DB |
 
 ## Attestation
 
