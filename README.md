@@ -60,8 +60,8 @@ This project automates the extraction of text from PDF files using two different
     - **User Authentication**:
       - **Login**: Endpoint for user login to authenticate users and initiate sessions.
       - **Registration**: Endpoint for new users to create accounts, storing their credentials securely in the database.
-    - Uploading PDFs for processing.
     - Fetching extracted data and metadata.
+    - **Downloading PDF Files**: API endpoints to facilitate the download of original PDF files.
     - Integrating with the OpenAI API for further insights.
 
 ### Step 5: AI Integration
