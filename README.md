@@ -106,6 +106,19 @@ AUTOMATING-TEXT-EXTRACTION/
 ├── airflow
 │   ├── config
 │   ├── dags
+│   │   ├── data_load
+│   │   │   ├── __init__.py
+│   │   │   ├── bigdatateam7_data_storage.log
+│   │   │   ├── data_load.py
+│   │   │   ├── data_storage_log.py
+│   │   │   ├── db_connection.py
+│   │   │   ├── parameter_config_airflow.py
+│   │   │   ├── pdf_extraction_open_source.py
+│   │   │   ├── pdf_extraction_unstructured.py
+│   │   │   ├── run_unstructured.sh
+│   │   │   └── update_url_froms3.py
+│   │   ├── __init__.py
+│   │   └── pipeline_pdf_extraction.py
 │   ├── logs
 │   ├── plugins
 │   ├── Dockerfile
@@ -115,6 +128,14 @@ AUTOMATING-TEXT-EXTRACTION/
 │   └── requirements.txt
 ├── architecture diagram
 │   ├── input_icons
+│   │   ├── HugingFace.png
+│   │   ├── OpenAI.png
+│   │   ├── PyMuPDF.jpeg
+│   │   ├── Unstructured.png
+│   │   ├── ec2.png
+│   │   ├── streamlit.png
+│   │   ├── user-authentication.png
+│   │   └── user.png
 │   ├── flow_diagram.ipynb
 │   └── flow_diagram.png
 ├── auth
@@ -122,14 +143,22 @@ AUTOMATING-TEXT-EXTRACTION/
 │   ├── logout.py
 │   └── register.py
 ├── data
-│   ├── __pycache__
 │   └── bigdatateam7_data_storage.log
 ├── fast_api
 │   ├── config
+│   │   └── db_connection.py
 │   ├── models
+│   │   └── user_models.py
 │   ├── routes
+│   │   ├── auth_routes.py
+│   │   ├── data_routes.py
+│   │   └── openai_routes.py
 │   ├── schemas
+│   │   └── request_schemas.py
 │   ├── services
+│   │   ├── auth_service.py
+│   │   ├── data_service.py
+│   │   └── openai_service.py
 │   └── fast_api_setup.py
 ├── features
 │   └── pdf_extractor.py
@@ -142,6 +171,7 @@ AUTOMATING-TEXT-EXTRACTION/
 │   ├── session_helpers.py
 │   └── validators.py
 ├── Dockerfile
+├── FOLDER_STRUCTURE.md
 ├── LICENSE
 ├── README.md
 ├── docker-compose.yml
