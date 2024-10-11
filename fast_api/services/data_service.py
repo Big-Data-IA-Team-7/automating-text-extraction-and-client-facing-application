@@ -1,8 +1,7 @@
-# This Python script provides utility functions for interacting with AWS S3 services using the Boto3 library.
-# It includes functionality for parsing S3 URLs, handling different file extensions, and generating presigned URLs 
-# for accessing S3 objects. The script initializes the S3 client using AWS credentials from environment variables 
-# and facilitates the seamless integration of S3 data within the application, with logging incorporated for monitoring purposes.
-
+import mysql.connector
+import pandas as pd
+from fast_api.config.db_connection import close_my_sql_connection, get_db_connection
+from project_logging import logging_module
 import boto3
 from urllib.parse import urlparse, unquote
 import os
@@ -10,22 +9,57 @@ import requests
 import tempfile
 from project_logging import logging_module
 import pandas as pd
-
-# File Extensions
-RETRIEVAL_EXT = ['.docx', '.txt', '.pdf', '.pptx']
-CI_EXT = ['.csv', '.xlsx', '.py', '.zip']
-IMG_EXT = ['.jpg', '.png']
-ERR_EXT = ['.pdb', '.jsonld']
-MP3_EXT = ['.mp3']
-
-# AWS credentials
-aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
-aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+from parameter_config import ACCESS_KEY_ID_AWS, SECRET_ACCESS_KEY_AWS
 
 # Initialize S3 client
 s3 = boto3.client('s3',
-                  aws_access_key_id=aws_access_key_id,
-                  aws_secret_access_key=aws_secret_access_key)
+                  aws_access_key_id=ACCESS_KEY_ID_AWS,
+                  aws_secret_access_key=SECRET_ACCESS_KEY_AWS)
+
+def fetch_data_from_db() -> pd.DataFrame:
+    """
+    Fetches data from the 'user login' table in the MySQL database and returns it as a pandas DataFrame.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the data fetched from the database, or None if an error occurs.
+    """
+    try:
+        # Connect to MySQL database
+        mydb = get_db_connection()
+        
+        if mydb.is_connected():
+            logging_module.log_success("Connected to the database for fetching data.")
+
+            # Create a cursor object
+            mydata = mydb.cursor()
+
+            # Execute the query
+            mydata.execute("SELECT * FROM gaia_metadata_tbl_pdf")
+            
+            # Fetch all the data
+            myresult = mydata.fetchall()
+
+            logging_module.log_success("Fetched data from gaia_metadata_tbl_pdf")
+
+            # Get column names
+            columns = [col[0] for col in mydata.description]
+
+            # Store the fetched data into a pandas DataFrame
+            df = pd.DataFrame(myresult, columns=columns)
+
+            return df
+
+    except mysql.connector.Error as e:
+        logging_module.log_error(f"Database error occurred: {e}")
+        return None
+
+    except Exception as e:
+        logging_module.log_error(f"An unexpected error occurred: {e}")
+        return None
+
+    finally:
+        # Ensure that the cursor and connection are properly closed
+        close_my_sql_connection(mydb, mydata)
 
 def parse_s3_url(url: str) -> tuple:
     """
@@ -124,14 +158,18 @@ def download_file(question: str, df: pd.DataFrame, extraction_method: str = None
     path = unquote(parsed_url.path)
     filename = os.path.basename(path)
     extension = os.path.splitext(filename)[1]
-    
-    # Create a temporary file with the correct extension
-    temp = tempfile.NamedTemporaryFile(delete=False, suffix=extension)
-    
+
+    # Create a temporary directory to hold the file
+    temp_dir = "/code/temp_files"
+    os.makedirs(temp_dir, exist_ok=True)
+
+    # Create a temporary file in the specified directory
+    temp = tempfile.NamedTemporaryFile(delete=False, suffix=extension, dir=temp_dir)
+
     # Get the file from the URL
     response = requests.get(file_name)
     response.raise_for_status()  # Check if the download was successful
-    
+
     # Write the content to the temporary file
     temp.write(response.content)
     temp.close()  # Close the file to finalize writing

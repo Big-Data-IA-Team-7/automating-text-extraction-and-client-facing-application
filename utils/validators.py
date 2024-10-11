@@ -1,18 +1,19 @@
 import json
+import tiktoken
 
 def answer_validation_check(final_answer: str, validation_answer: str):
-    final_answer = final_answer.strip().lower()
+    final_answer = final_answer.strip().lower().replace('"', '')
 
     if not validation_answer:
         return None
 
-    validation_answer = validation_answer.strip().lower().replace('`', '')
+    validation_answer = validation_answer.strip().lower()
 
-    if final_answer.isdigit():
-        validation_list = validation_answer.split()
-        return 1 if final_answer not in validation_list else 2
+    if validation_answer.isdigit():
+        final_list = final_answer.split()
+        return 1 if validation_answer not in final_list else 2
     else:
-        return 1 if final_answer not in validation_answer else 2
+        return 1 if validation_answer not in final_answer else 2
 
 def extract_json_contents(file_path):
     with open(file_path, 'r') as file:
@@ -30,3 +31,9 @@ def extract_txt_contents(file_path):
         file_content = file.read()
 
         return file_content
+
+def num_tokens_from_string(question_contents: str, model: str) -> int:
+    """Returns the number of tokens in a text string."""
+    encoding = tiktoken.encoding_for_model(model)
+    num_tokens = len(encoding.encode(question_contents))
+    return num_tokens

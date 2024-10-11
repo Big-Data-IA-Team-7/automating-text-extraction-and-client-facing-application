@@ -5,15 +5,8 @@
 
 import os
 import mysql.connector
-from dotenv import load_dotenv
-load_dotenv()
-
-# Getting in Environmental variables
-aws_rds_host=os.getenv('AWS_RDS_HOST')
-aws_rds_user=os.getenv('AWS_RDS_USERNAME')
-aws_rds_password=os.getenv('AWS_RDS_PASSWORD')
-aws_rds_port =os.getenv('AWS_RDS_DB_PORT')
-aws_rds_database = os.getenv('AWS_RDS_DATABASE')
+from project_logging import logging_module
+from parameter_config import RDS_HOST_AWS, RDS_USERNAME_AWS, RDS_PASSWORD_AWS, RDS_DATABASE_AWS, RDS_DB_PORT_AWS
 
 def get_db_connection() -> mysql.connector.connection_cext.CMySQLConnection:
     """
@@ -23,9 +16,18 @@ def get_db_connection() -> mysql.connector.connection_cext.CMySQLConnection:
         mysql.connector.connection_cext.CMySQLConnection: A MySQL database connection object.
     """
     return mysql.connector.connect(
-        host= aws_rds_host,
-        user=aws_rds_user,
-        password=aws_rds_password,
-        port =aws_rds_port,
-        database=aws_rds_database
+        host= RDS_HOST_AWS,
+        user=RDS_USERNAME_AWS,
+        password=RDS_PASSWORD_AWS,
+        port =RDS_DB_PORT_AWS,
+        database=RDS_DATABASE_AWS
     )
+
+def close_my_sql_connection(mydb, mydata = None):
+    try:
+        if mydb.is_connected():
+            mydata.close()
+            mydb.close()
+            logging_module.log_success("MySQL connection closed.")
+    except Exception as e:
+        logging_module.log_error(f"Error closing the MySQL connection: {e}")
