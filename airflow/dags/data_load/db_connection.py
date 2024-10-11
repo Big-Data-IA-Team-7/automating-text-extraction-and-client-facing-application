@@ -6,14 +6,15 @@
 import os
 import mysql.connector
 from dotenv import load_dotenv
+from data_load.parameter_config_airflow import AWS_RDS_HOST,AWS_RDS_USERNAME,AWS_RDS_PASSWORD,AWS_RDS_DB_PORT,AWS_RDS_DATABASE
 load_dotenv()
 
 # Getting in Environmental variables
-aws_rds_host=os.getenv('AWS_RDS_HOST')
-aws_rds_user=os.getenv('AWS_RDS_USERNAME')
-aws_rds_password=os.getenv('AWS_RDS_PASSWORD')
-aws_rds_port =os.getenv('AWS_RDS_DB_PORT')
-aws_rds_database = os.getenv('AWS_RDS_DATABASE')
+aws_rds_host=AWS_RDS_HOST
+aws_rds_user=AWS_RDS_USERNAME
+aws_rds_password=AWS_RDS_PASSWORD
+aws_rds_port =AWS_RDS_DB_PORT
+aws_rds_database = AWS_RDS_DATABASE
 
 def get_db_connection() -> mysql.connector.connection_cext.CMySQLConnection:
     """
