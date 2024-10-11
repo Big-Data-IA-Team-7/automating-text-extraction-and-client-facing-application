@@ -55,29 +55,111 @@ This project automates the extraction of text from PDF files using two different
 ### Step 4: AI Integration
 - **OpenAI GPT Model**: Used to handle natural language queries on the extracted data, providing insights based on the document content.
 
+
+## How to Run the application
+
+```bash
+git clone https://github.com/Big-Data-IA-Team-7/automating-text-extraction-and-client-facing-application.git
+
+# UPDATE PARAMETER STORE WITH YOUR KEYS AND SETUP  IAM ACCESS
+ACCESS_KEY_ID_AWS: <your-access-key-id>
+SECRET_ACCESS_KEY_AWS: <your-secret-access-key>
+OPEN_AI_API_KEY: <your-open-ai-api-key>
+
+# Dockerize the application
+
+docker build -t ramkumarrp16077/airflow-image:latest .
+ 
+#create tage and then push
+docker push ramkumarrp16077/airflow-image:latest
+
+# Create an EC instance and do the below pre requisities
+
+sudo apt-get update
+sudo apt-get install docker.io
+sudo systemctl start docker
+sudo systemctl enable docker
+
+docker login
+docker pull ramkumarrp16077/airflow-image:latest .
+
+
+# To run the application
+docker run -d -p 8080:8080 ramkumarrp16077/airflow-image:latest
+
+```
+
+Access the Application
+http://75.101.133.31:8080 for Airflow
+http://75.101.133.31:8501 for Streamlit
+
+
+
+
+
+
 ## Repository Structure
 
 ```bash
 AUTOMATING-TEXT-EXTRACTION/
-├── architecture_diagram/
-│   ├── input_icons/
-│   │   ├── flow_diagram.ipynb
-│   │   ├── flow_diagram.png
-├── data/
-│   ├── data_read.py
-│   ├── data_s3.py
-│   ├── data_storage.py
-│   ├── data_storage_log.py
-│   └── db_connection.py
-├── openai_api/
-│   ├── openai_api_call.py
-│   └── openai_api_streamlit.py
-├── pages/
-│   ├── 1_Predicting.py
-│   └── 2_Dashboard.py
-├── project_logging/
-│   └── logging_module.py
-├── .env.example
-├── Home.py
+.
+├── airflow
+│   ├── config
+│   ├── dags
+│   ├── logs
+│   ├── plugins
+│   ├── Dockerfile
+│   ├── __init__.py
+│   ├── docker-compose.yaml
+│   ├── entrypoint.sh
+│   └── requirements.txt
+├── architecture diagram
+│   ├── input_icons
+│   ├── flow_diagram.ipynb
+│   └── flow_diagram.png
+├── auth
+│   ├── login.py
+│   ├── logout.py
+│   └── register.py
+├── data
+│   ├── __pycache__
+│   └── bigdatateam7_data_storage.log
+├── fast_api
+│   ├── config
+│   ├── models
+│   ├── routes
+│   ├── schemas
+│   ├── services
+│   └── fast_api_setup.py
+├── features
+│   └── pdf_extractor.py
+├── project_logging
+│   ├── __init__.py
+│   └── logging_module.py
+├── utils
+│   ├── __init__.py
+│   ├── api_helpers.py
+│   ├── session_helpers.py
+│   └── validators.py
+├── Dockerfile
+├── LICENSE
 ├── README.md
-└── requirements.txt
+├── docker-compose.yml
+├── parameter_config.py
+├── requirements.txt
+└── streamlit_app.py
+
+
+
+
+## Contributions
+
+| Name                      | Contribution                                                           |
+|---------------------------|------------------------------------------------------------------------|
+| **Pragnesh Anekal**        | 33% - OpenAI API integration, Streamlit integration with API, FAST API, JWT Keys, Unstructured API  , Deployment          |
+| **Ram Kumar Ramasamy Pandiaraj** | 33% - Loading data from Hugging Face to S3, Open Source PDF Extraction, Docker, Airflow DAGs, Deployment   |
+| **Dipen Manoj Patel**      | 33% - Streamlit UI for Predicting Page, User Registration and Authentication,  Dockerizing Fast API, Validating Answers flow, reading data from DB |
+
+## Attestation
+
+**WE ATTEST THAT WE HAVEN’T USED ANY OTHER STUDENTS’ WORK IN OUR ASSIGNMENT AND ABIDE BY THE POLICIES LISTED IN THE STUDENT HANDBOOK.**
