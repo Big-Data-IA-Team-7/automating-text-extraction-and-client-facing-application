@@ -1,3 +1,10 @@
+'''This script automates the process of loading GAIA metadata into AWS RDS MySQL and uploading files to AWS S3.
+It connects to Hugging Face to fetch the GAIA dataset, processes it, and inserts the metadata into MySQL.
+Files are downloaded from Hugging Face, uploaded to S3, and the MySQL table is updated with S3 URLs and file extensions.
+Error handling is included for database connections, API requests, and file operations, ensuring smooth execution.
+The script is designed to handle large datasets efficiently while logging success and failure at each step.
+'''
+
 import os
 from datasets import load_dataset
 from huggingface_hub import login
@@ -6,31 +13,27 @@ import boto3
 import requests
 import mysql.connector
 from mysql.connector import Error
-from dotenv import load_dotenv
+from data_load.parameter_config_airflow import AWS_ACCESS_KEY_ID , AWS_SECRET_ACCESS_KEY, AWS_S3_BUCKET_NAME, AWS_RDS_HOST, AWS_RDS_USERNAME, AWS_RDS_PASSWORD, AWS_RDS_DB_PORT, AWS_RDS_DATABASE, HUGGINGFACE_TOKEN
 import data_load.data_storage_log as logging_module
 from data_load.db_connection import get_db_connection
 import pandas as pd
 import logging
+import data_load.parameter_config_airflow
 
-# Load environment variables
-load_dotenv()
-
- # Getting environmental variables
-aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
-aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
-aws_bucket_name = os.getenv('AWS_S3_BUCKET_NAME')
-aws_rds_host = os.getenv('AWS_RDS_HOST')
-aws_rds_user = os.getenv('AWS_RDS_USERNAME')
-aws_rds_password = os.getenv('AWS_RDS_PASSWORD')
-aws_rds_port = os.getenv('AWS_RDS_DB_PORT')
-aws_rds_database = os.getenv('AWS_RDS_DATABASE')
-hugging_face_token = os.getenv('HUGGINGFACE_TOKEN')
-
+# Getting environmental variables
+aws_access_key_id = AWS_ACCESS_KEY_ID
+aws_secret_access_key = AWS_SECRET_ACCESS_KEY
+aws_bucket_name = AWS_S3_BUCKET_NAME
+aws_rds_host = AWS_RDS_HOST
+aws_rds_user = AWS_RDS_USERNAME
+aws_rds_password = AWS_RDS_PASSWORD
+aws_rds_port = AWS_RDS_DB_PORT
+aws_rds_database = AWS_RDS_DATABASE
+hugging_face_token = HUGGINGFACE_TOKEN
 
 # Function to load the GAIA metadata into MySQL RDS
 def load_gaia_metadata_tbl():
-   
-
+    """Loads the GAIA dataset from Hugging Face into an AWS RDS MySQL table"""
     # MySQL connection to AWS RDS
     try:
         connection = get_db_connection()
@@ -112,7 +115,7 @@ def load_gaia_metadata_tbl():
 
 # Function to download files from Hugging Face, upload them to S3, and update MySQL RDS
 def upload_gaia_files_to_s3_and_update_rds():
-
+    """Downloads GAIA dataset files from Hugging Face, uploads them to AWS S3, and updates the corresponding MySQL RDS records with S3 URLs and file extensions."""
     # MySQL connection to AWS RDS
     try:
         connection = get_db_connection()

@@ -18,7 +18,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy your DAGs and other files
 COPY dags /opt/airflow/dags
-
+COPY dags/data_load/parameter_config_airflow.py /opt/airflow/dags/data_load/parameter_config_airflow.py
 # Set environment variables
 ENV AIRFLOW_UID=50000
 ENV AIRFLOW_HOME=/opt/airflow
