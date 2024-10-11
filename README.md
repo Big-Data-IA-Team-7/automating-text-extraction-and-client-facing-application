@@ -53,7 +53,18 @@ This project automates the extraction of text from PDF files using two different
   - View and download extracted content.
   - Analyze the metadata and processed data.
 
-### Step 4: AI Integration
+### Step 4: API Development with FastAPI
+
+- **FastAPI**: Serves as a backend framework to create and manage API endpoints for the application. It handles requests for PDF processing and data retrieval, ensuring efficient communication between the client interface and the underlying services.
+  - Provides endpoints for:
+    - **User Authentication**:
+      - **Login**: Endpoint for user login to authenticate users and initiate sessions.
+      - **Registration**: Endpoint for new users to create accounts, storing their credentials securely in the database.
+    - Uploading PDFs for processing.
+    - Fetching extracted data and metadata.
+    - Integrating with the OpenAI API for further insights.
+
+### Step 5: AI Integration
 
 - **OpenAI GPT Model**: Used to handle natural language queries on the extracted data, providing insights based on the document content.
 
