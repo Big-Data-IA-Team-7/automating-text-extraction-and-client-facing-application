@@ -51,9 +51,10 @@ AWS_S3_BUCKET_NAME = parameters_1.get('S3_BUCKET_NAME_AWS')
 HUGGINGFACE_TOKEN = parameters_1.get('HUGGINGFACE_TOKEN')
 
 # Save specific variables to .env file
-print(f'export AWS_ACCESS_KEY_ID="{AWS_ACCESS_KEY_ID}"')
-print(f'export AWS_SECRET_ACCESS_KEY="{AWS_SECRET_ACCESS_KEY}"')
-print(f'export UNSTRUCTURED_API_KEY="{UNSTRUCTURED_API_KEY}"')
-print(f'export UNSTRUCTURED_API_URL="{UNSTRUCTURED_API_URL}"')
-print(f'export AWS_S3_OUTPUT_URI="{AWS_S3_OUTPUT_URI}"')
-print(f'export AWS_S3_URL="{AWS_S3_URL}"')
+with open('/tmp/env_file.sh', 'w') as env_file:  # You can choose any file path
+    env_file.write(f'export AWS_ACCESS_KEY_ID="{AWS_ACCESS_KEY_ID}"\n')
+    env_file.write(f'export AWS_SECRET_ACCESS_KEY="{AWS_SECRET_ACCESS_KEY}"\n')
+    env_file.write(f'export UNSTRUCTURED_API_KEY="{UNSTRUCTURED_API_KEY}"\n')
+    env_file.write(f'export UNSTRUCTURED_API_URL="{UNSTRUCTURED_API_URL}"\n')
+    env_file.write(f'export AWS_S3_OUTPUT_URI="{AWS_S3_OUTPUT_URI}"\n')
+    env_file.write(f'export AWS_S3_URL="{AWS_S3_URL}"\n')
